@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Portal — Robust Face Authentication Framework</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #040d0f;
+    --surface: #0d1f1a;
+    --surface2: #132b24;
+    --border: rgba(16,185,129,0.12);
+    --accent: #10b981;
+    --accent2: #34d399;
+    --text: #ecfdf5;
+    --muted: #6b7a72;
+    --danger: #f87171;
+    --warn: #fbbf24;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 400px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+  header {
+    padding: 24px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .back-btn {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover { color: var(--text); border-color: rgba(16,185,129,0.3); }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .page-hero {
+    padding: 56px 0 40px;
+    text-align: center;
+  }
+
+  .page-hero .tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.25);
+    color: var(--accent);
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .page-hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+  }
+
+  .page-hero p { color: var(--muted); font-size: 16px; }
+
+  /* Search Section */
+  .search-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 32px;
+  }
+
+  .search-section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--accent);
+  }
+
+  .search-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+
+  .form-group label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .form-group input, .form-group select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+
+  .search-btn {
+    padding: 12px 28px;
+    background: var(--accent);
+    color: #040d0f;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .search-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+
+  /* Upload hint */
+  .upload-hint {
+    background: rgba(251,191,36,0.06);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--warn);
+    font-size: 13px;
+    margin-top: 16px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+
+  /* Results */
+  #results { display: none; }
+
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .sum-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .sum-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .sum-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+  /* Progress ring */
+  .ring-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .ring-container { position: relative; flex-shrink: 0; }
+
+  .ring-svg { transform: rotate(-90deg); }
+
+  .ring-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .ring-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .ring-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .ring-info h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .ring-info p { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .status-good { background: rgba(16,185,129,0.12); color: var(--accent); border: 1px solid rgba(16,185,129,0.25); }
+  .status-warn { background: rgba(251,191,36,0.12); color: var(--warn); border: 1px solid rgba(251,191,36,0.25); }
+  .status-bad  { background: rgba(248,113,113,0.12); color: var(--danger); border: 1px solid rgba(248,113,113,0.25); }
+
+  /* Table */
+  .table-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+
+  .table-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .table-header h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .total-badge {
+    background: rgba(16,185,129,0.1);
+    color: var(--accent);
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    padding: 12px 24px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(16,185,129,0.04);
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr { border-bottom: 1px solid rgba(16,185,129,0.06); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(16,185,129,0.04); }
+
+  td { padding: 14px 24px; font-size: 14px; }
+
+  .present-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(16,185,129,0.1);
+    color: var(--accent);
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .absent-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(248,113,113,0.1);
+    color: var(--danger);
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--muted);
+  }
+
+  .no-results .emoji { font-size: 48px; margin-bottom: 16px; }
+  .no-results h3 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+
+  /* File Input */
+  .file-upload-area {
+    border: 2px dashed rgba(16,185,129,0.25);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 20px;
+  }
+
+  .file-upload-area:hover { border-color: var(--accent); background: rgba(16,185,129,0.04); }
+  .file-upload-area input { display: none; }
+  .file-upload-area p { color: var(--muted); font-size: 14px; }
+  .file-upload-area .upload-icon { font-size: 32px; margin-bottom: 8px; }
+  .file-upload-area strong { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .summary-cards { grid-template-columns: repeat(2, 1fr); }
+    .ring-wrap { flex-direction: column; text-align: center; }
+    .search-row { grid-template-columns: 1fr; }
+    .page-hero h1 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+    <div class="logo">RobustAuth</div>
+    <div style="font-size:13px;color:var(--muted)" id="todayDate"></div>
+  </header>
+
+  <div class="page-hero">
+    <div class="tag">👨‍🎓 Student Portal</div>
+    <h1>My Attendance</h1>
+    <p>Upload CSV files or search by name to check attendance</p>
+  </div>
+
+  <!-- SEARCH SECTION -->
+  <div class="search-section">
+    <h3>📂 Upload Attendance File</h3>
+
+    <div class="file-upload-area" onclick="document.getElementById('csvFiles').click()">
+      <div class="upload-icon">📋</div>
+      <p><strong>Click or drag</strong> attendance CSV files here</p>
+      <p style="font-size:12px;margin-top:4px">Select attendance/attendance_YYYY-MM-DD.csv files</p>
+      <input type="file" id="csvFiles" accept=".csv" multiple onchange="handleFiles(this.files)">
+    </div>
+
+    <div class="search-row">
+      <div class="form-group">
+        <label>Student Name</label>
+        <input type="text" id="studentName" placeholder="Example: Riteek Tiwari" list="studentList">
+        <datalist id="studentList"></datalist>
+      </div>
+      <button class="search-btn" onclick="searchStudent()">🔍 View</button>
+    </div>
+
+    <div class="upload-hint">
+      <span>💡</span>
+      <span><strong>How to use:</strong> Select all CSV files from the attendance folder, then type your name and press View.</span>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="summary-cards">
+      <div class="sum-card">
+        <div class="sum-num" id="totalDays" style="color:var(--accent)">0</div>
+        <div class="sum-label">Total Classes</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" id="presentDays" style="color:var(--accent)">0</div>
+        <div class="sum-label">Present</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" id="absentDays" style="color:var(--danger)">0</div>
+        <div class="sum-label">Absent</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" id="pctNum" style="color:var(--warn)">0%</div>
+        <div class="sum-label">Percentage</div>
+      </div>
+    </div>
+
+    <div class="ring-wrap">
+      <div class="ring-container">
+        <svg class="ring-svg" width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="56" fill="none" stroke="rgba(16,185,129,0.1)" stroke-width="12"/>
+          <circle id="progressRing" cx="70" cy="70" r="56" fill="none" stroke="var(--accent)"
+            stroke-width="12" stroke-linecap="round"
+            stroke-dasharray="351.86" stroke-dashoffset="351.86"
+            style="transition: stroke-dashoffset 1s ease;"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-pct" id="ringPct">0%</div>
+          <div class="ring-sub">Attendance</div>
+        </div>
+      </div>
+      <div class="ring-info">
+        <h3 id="studentNameDisplay">Student</h3>
+        <p id="attendanceMsg">Attendance data is loading...</p>
+        <div id="statusPill" class="status-pill status-good">✅ Good Standing</div>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <div class="table-header">
+        <h3>📅 Attendance History</h3>
+        <span class="total-badge" id="totalBadge">0 records</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="noData" style="display:none">
+    <div class="no-results">
+      <div class="emoji">🔍</div>
+      <h3>No record found</h3>
+      <p>The name "<span id="searchedName"></span>" was not found in the CSV files.<br>Type the name exactly as it appears in attendance.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('hi-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  let allData = {}; // { date: [{ Name, Time, Status }] }
+  let allNames = new Set();
+
+  function handleFiles(files) {
+    allData = {};
+    allNames = new Set();
+
+    let loaded = 0;
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const dateMatch = file.name.match(/attendance_(\d{4}-\d{2}-\d{2})/);
+        const date = dateMatch ? dateMatch[1] : file.name.replace('.csv','').replace('attendance_','');
+
+        const lines = text.trim().split('\n');
+        if (lines.length < 2) return;
+        const headers = lines[0].split(',').map(h => h.trim());
+        const nameIdx = headers.indexOf('Name');
+        const timeIdx = headers.indexOf('Time');
+        const statusIdx = headers.indexOf('Status');
+
+        allData[date] = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',').map(c => c.trim());
+          if (!cols[nameIdx]) continue;
+          const name = cols[nameIdx];
+          allNames.add(name);
+          allData[date].push({
+            Name: name,
+            Time: timeIdx >= 0 ? cols[timeIdx] : '—',
+            Status: statusIdx >= 0 ? cols[statusIdx] : 'Present'
+          });
+        }
+
+        loaded++;
+        if (loaded === files.length) {
+          // Update datalist
+          const dl = document.getElementById('studentList');
+          dl.innerHTML = '';
+          allNames.forEach(n => {
+            const opt = document.createElement('option');
+            opt.value = n;
+            dl.appendChild(opt);
+          });
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  function searchStudent() {
+    const name = document.getElementById('studentName').value.trim();
+    if (!name) { alert('Type your name first!'); return; }
+    if (Object.keys(allData).length === 0) { alert('Upload CSV files first!'); return; }
+
+    document.getElementById('searchedName').textContent = name;
+
+    const allDates = Object.keys(allData).sort();
+    const presentDates = [];
+    const records = [];
+
+    allDates.forEach(date => {
+      const dayRecords = allData[date];
+      const found = dayRecords.find(r => r.Name.toLowerCase() === name.toLowerCase());
+      if (found) {
+        presentDates.push(date);
+        records.push({ date, time: found.Time, status: found.Status });
+      }
+    });
+
+    const total = allDates.length;
+    const present = presentDates.length;
+    const absent = total - present;
+    const pct = total > 0 ? Math.round((present / total) * 100) : 0;
+
+    if (present === 0 && total > 0 && !allNames.has(name)) {
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('noData').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('noData').style.display = 'none';
+
+    // Update numbers
+    document.getElementById('totalDays').textContent = total;
+    document.getElementById('presentDays').textContent = present;
+    document.getElementById('absentDays').textContent = absent;
+    document.getElementById('pctNum').textContent = pct + '%';
+    document.getElementById('ringPct').textContent = pct + '%';
+    document.getElementById('studentNameDisplay').textContent = name;
+    document.getElementById('totalBadge').textContent = records.length + ' records';
+
+    // Progress ring
+    const circumference = 2 * Math.PI * 56;
+    const offset = circumference - (pct / 100) * circumference;
+    setTimeout(() => {
+      document.getElementById('progressRing').style.strokeDashoffset = offset;
+    }, 100);
+
+    // Status
+    const pill = document.getElementById('statusPill');
+    const msg = document.getElementById('attendanceMsg');
+    if (pct >= 75) {
+      pill.className = 'status-pill status-good';
+      pill.textContent = '✅ Good Standing';
+      msg.textContent = `${name} has ${pct}% attendance. Excellent performance: ${present} present records out of ${total} classes.`;
+    } else if (pct >= 60) {
+      pill.className = 'status-pill status-warn';
+      pill.textContent = '⚠️ Improvement Needed';
+      msg.textContent = `${name} has ${pct}% attendance. This is below the recommended level; try to keep it above 75%.`;
+    } else {
+      pill.className = 'status-pill status-bad';
+      pill.textContent = '❌ Critical — Below 60%';
+      msg.textContent = `${name} has only ${pct}% attendance. This is very low, and immediate attention is required.`;
+    }
+
+    // Table
+    const tbody = document.getElementById('attendanceTable');
+    tbody.innerHTML = '';
+
+    // Show all dates with present/absent
+    let sr = 1;
+    allDates.forEach(date => {
+      const rec = records.find(r => r.date === date);
+      const tr = document.createElement('tr');
+      if (rec) {
+        tr.innerHTML = `
+          <td style="color:var(--muted)">${sr++}</td>
+          <td>${date}</td>
+          <td style="font-family:'Courier New',monospace;font-size:13px">${rec.time}</td>
+          <td><span class="present-badge">✅ Present</span></td>`;
+      } else {
+        tr.innerHTML = `
+          <td style="color:var(--muted)">${sr++}</td>
+          <td>${date}</td>
+          <td style="color:var(--muted)">—</td>
+          <td><span class="absent-badge">❌ Absent</span></td>`;
+      }
+      tbody.appendChild(tr);
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "time_locked_attendance": true,
+  "window_minutes": 60,
+  "schedules": [
+    {
+      "day": "daily",
+      "start_time": "00:00",
+      "end_time": "23:59",
+      "subject": "Computer Vision and Biometric Attendance Lab",
+      "teacher": "Project Supervisor",
+      "room": "LBAMS Demonstration Lab",
+      "class_code": "LBAMS-CV-01"
+    },
+    {
+      "day": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "subject": "Deep Learning for Face Authentication",
+      "teacher": "Project Supervisor",
+      "room": "Smart Classroom"
+    },
+    {
+      "day": "Wednesday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "subject": "Intelligent Attendance Systems",
+      "teacher": "Project Supervisor",
+      "room": "Computer Vision Lab"
+    }
+  ]
+}

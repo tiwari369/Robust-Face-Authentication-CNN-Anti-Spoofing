@@ -1,0 +1,21 @@
+Blink + CNN Anti-Spoofing Notes
+
+This project uses two anti-spoofing layers:
+
+1. Blink liveness verification:
+   - Mandatory by default.
+   - Confirms a live open-eye -> closed-eye -> open-eye pattern.
+
+2. CNN anti-spoofing audit:
+   - Enabled by default.
+   - Evaluates the detected face crop and returns a live/spoof risk score.
+   - The score is displayed in the camera window and saved in attendance confidence logs.
+
+Recommended configuration for classroom demonstration:
+
+require_blink_for_attendance = true
+enable_cnn_antispoof = true
+enforce_cnn_antispoof = false
+
+Why CNN is audit-only by default:
+Classroom webcams and lighting conditions can vary significantly. Strict CNN blocking may reject genuine students on weak laptop cameras. Therefore, blink liveness is the required live-person gate, while CNN is recorded and displayed as an anti-spoofing score. For strict security testing, set enforce_cnn_antispoof to true in runtime_config.json.

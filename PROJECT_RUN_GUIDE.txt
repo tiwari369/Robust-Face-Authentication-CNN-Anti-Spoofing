@@ -1,0 +1,90 @@
+A Robust Face Authentication Framework with CNN-Based Anti-Spoofing for Intelligent Attendance Systems
+Complete Run Guide for Windows + VS Code + Python 3.13.x
+
+1. Extract the project ZIP.
+2. Open the extracted folder in VS Code.
+3. Open Terminal -> New Terminal.
+4. Create a virtual environment:
+
+   py -3.13 -m venv .venv
+
+5. Activate the virtual environment:
+
+   .venv\Scripts\activate
+
+6. Upgrade package tools:
+
+   python -m pip install --upgrade pip setuptools wheel
+
+7. Install project requirements:
+
+   python -m pip install -r requirements.txt
+
+8. Validate project files:
+
+   python validate_project.py
+
+9. Start the attendance camera:
+
+   python attendance_system.py
+
+Camera controls:
+
+   Q      Quit
+   SPACE  Save a manual face capture and force a matching attempt
+   ENTER  Same as SPACE on many keyboards
+   B      Reset blink liveness state
+   R      Clear the current visual message
+
+Attendance workflow:
+
+   1. Face is detected by the camera.
+   2. Blink liveness is verified.
+   3. The detected face crop is evaluated by the CNN anti-spoofing audit module.
+   4. The captured face is matched with enrolled dataset photographs.
+   5. LBPH is used as a secondary verification layer.
+   6. Attendance is saved only after a confident identity match.
+
+Dashboard:
+
+   python run_dashboard.py
+
+Open the browser URL displayed in the terminal. The default local address is:
+
+   http://localhost:8000/dashboard.html
+
+Administrator panel:
+
+   python admin_panel.py
+
+Default password:
+
+   admin123
+
+One-click Windows scripts:
+
+   setup_windows_py313.bat   First-time environment setup
+   run_attendance.bat        Start attendance camera
+   open_dashboard.bat        Start dashboard server
+   retrain_model.bat         Retrain recognition models
+
+Important folders:
+
+   attendance/               Attendance CSV and Excel records
+   manual_captures/          SPACE-key manual capture attempts
+   attendance_snapshots/     Successful attendance audit snapshots
+   models/                   Trained model files
+   dataset/                  Enrolled student image dataset
+
+Configuration files:
+
+   runtime_config.json       Blink, CNN, camera, and threshold settings
+   schedule.json             Class schedule and time-lock settings
+
+Recommended demo configuration:
+
+   require_blink_for_attendance = true
+   enable_cnn_antispoof = true
+   enforce_cnn_antispoof = false
+
+This keeps blink liveness as the mandatory live-person gate and CNN as a visible/logged anti-spoofing audit score.

@@ -1,0 +1,30 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Sensitive biometric/generated data - do not upload to GitHub
+dataset/
+manual_captures/
+attendance_snapshots/
+attendance/
+reports/
+models/
+
+# Database, logs, exports
+*.db
+*.sqlite3
+*.csv
+*.xlsx
+*.log
+
+# Secrets and local files
+.env
+.DS_Store
+Thumbs.db

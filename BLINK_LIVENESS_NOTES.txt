@@ -1,0 +1,18 @@
+Blink Liveness Notes
+
+The attendance camera uses blink liveness verification as the mandatory live-person gate.
+
+Workflow:
+1. The student looks at the camera.
+2. The system observes an open-eye state.
+3. The student blinks once slowly.
+4. The system detects a closed-eye state.
+5. The eyes open again.
+6. The liveness state becomes verified for a short period.
+7. Captured-face matching and attendance marking are allowed only after verification.
+
+Recommended use:
+- Keep the face centered.
+- Blink slowly once: open eyes, close eyes, open eyes again.
+- Hold the face steady for one or two seconds after blinking.
+- Press SPACE if automatic matching is delayed.

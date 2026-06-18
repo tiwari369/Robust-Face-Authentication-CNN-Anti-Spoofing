@@ -1,0 +1,17 @@
+{
+  "auto_mark_attendance": true,
+  "capture_match_mode": true,
+  "require_blink_for_attendance": true,
+  "enforce_texture_anti_spoof": false,
+  "save_attendance_snapshots": true,
+  "gallery_similarity_threshold": 0.38,
+  "gallery_gap_threshold": 0.01,
+  "lbph_threshold": 128.0,
+  "camera_index": 0,
+  "camera_width": 1280,
+  "camera_height": 720,
+  "blink_liveness_hold_seconds": 12,
+  "enable_cnn_antispoof": true,
+  "enforce_cnn_antispoof": false,
+  "cnn_antispoof_threshold": 0.42
+}

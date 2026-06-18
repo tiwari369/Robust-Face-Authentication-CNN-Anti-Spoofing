@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Portal — Robust Face Authentication Framework</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#070c18;--surface:#0e1629;--surface2:#152038;
+    --border:rgba(0,229,255,0.1);--accent:#00e5ff;--accent2:#00b8d9;
+    --text:#e8f4ff;--muted:#5a6a8a;
+    --success:#10b981;--warn:#f59e0b;--danger:#ef4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  body::before{
+    content:'';position:fixed;top:0;left:0;right:0;height:300px;
+    background:radial-gradient(ellipse at 50% 0%,rgba(0,229,255,0.06) 0%,transparent 70%);
+    pointer-events:none;z-index:0;
+  }
+  .container{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 24px;}
+
+  header{
+    padding:22px 0;display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--border);
+  }
+  .back-btn{
+    display:flex;align-items:center;gap:8px;color:var(--muted);text-decoration:none;
+    font-size:14px;font-weight:500;padding:8px 16px;border:1px solid var(--border);
+    border-radius:8px;transition:all .2s;
+  }
+  .back-btn:hover{color:var(--text);border-color:rgba(0,229,255,.3);}
+  .logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--accent);}
+  .admin-badge{
+    background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);
+    color:var(--accent);padding:6px 14px;border-radius:100px;font-size:12px;font-weight:700;
+  }
+
+  .hero{padding:44px 0 28px;text-align:center;}
+  .hero h1{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:8px;}
+  .hero p{color:var(--muted);font-size:15px;}
+
+  /* Action cards */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
+
+  .acard{
+    background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    padding:22px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;
+  }
+  .acard:hover{transform:translateY(-3px);border-color:rgba(0,229,255,.25);
+    box-shadow:0 12px 36px rgba(0,229,255,.07);}
+  .acard .icon{font-size:28px;margin-bottom:12px;}
+  .acard h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:6px;}
+  .acard p{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px;}
+  .acard .cmd-tag{
+    font-family:'Courier New',monospace;font-size:11px;
+    background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.15);
+    color:var(--accent);padding:5px 10px;border-radius:6px;
+    display:inline-block;
+  }
+  .run-btn{
+    position:absolute;top:14px;right:14px;
+    background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);
+    color:var(--accent);padding:4px 10px;border-radius:6px;
+    font-size:11px;font-weight:700;cursor:pointer;
+    transition:all .2s;font-family:'Syne',sans-serif;
+  }
+  .run-btn:hover{background:rgba(0,229,255,.2);}
+
+  /* Modal */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.85);
+    backdrop-filter:blur(8px);z-index:100;
+    display:none;align-items:center;justify-content:center;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--surface);border:1px solid var(--border);border-radius:20px;
+    padding:36px;width:100%;max-width:500px;position:relative;
+    animation:mIn .25s ease;
+  }
+  @keyframes mIn{from{opacity:0;transform:scale(.95) translateY(8px);}to{opacity:1;transform:none;}}
+  .mclose{
+    position:absolute;top:16px;right:16px;background:var(--surface2);
+    border:1px solid var(--border);color:var(--muted);
+    width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:15px;
+    display:flex;align-items:center;justify-content:center;transition:all .2s;
+  }
+  .mclose:hover{color:var(--text);}
+  .modal h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px;}
+  .modal .subtitle{color:var(--muted);font-size:13px;margin-bottom:24px;}
+
+  .steps{display:flex;flex-direction:column;gap:14px;}
+  .step{
+    display:flex;align-items:flex-start;gap:14px;
+    background:var(--surface2);border:1px solid var(--border);
+    border-radius:12px;padding:16px;
+  }
+  .step-num{
+    min-width:28px;height:28px;border-radius:50%;
+    background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.25);
+    color:var(--accent);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .step-body p{font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5;}
+  .cmd-block{
+    background:#0a0f1e;border:1px solid rgba(255,255,255,.06);
+    border-radius:8px;padding:10px 14px;
+    font-family:'Courier New',monospace;font-size:13px;color:#7ee787;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .copy-btn{
+    background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);
+    color:var(--accent);padding:4px 10px;border-radius:5px;
+    font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;
+    transition:all .2s;font-family:'Syne',sans-serif;
+  }
+  .copy-btn:hover{background:rgba(0,229,255,.2);}
+  .copy-btn.copied{background:rgba(16,185,129,.15);color:var(--success);border-color:rgba(16,185,129,.3);}
+
+  .note{
+    background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);
+    color:var(--warn);border-radius:10px;padding:12px 16px;
+    font-size:13px;line-height:1.5;margin-top:18px;
+  }
+
+  /* Password change panel */
+  .pw-panel{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;padding:24px;margin-bottom:28px;
+  }
+  .pw-panel h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--accent);margin-bottom:14px;}
+  .pw-row{display:flex;gap:12px;align-items:flex-end;}
+  .pw-row input{
+    flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;
+    padding:10px 14px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;
+    transition:border-color .2s;
+  }
+  .pw-row input:focus{border-color:var(--accent);}
+  .pw-save{
+    padding:10px 20px;background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.25);
+    color:var(--accent);border-radius:8px;cursor:pointer;font-weight:700;
+    font-size:13px;font-family:'Syne',sans-serif;transition:all .2s;white-space:nowrap;
+  }
+  .pw-save:hover{background:rgba(0,229,255,.22);}
+  .pw-note{font-size:12px;color:var(--muted);margin-top:8px;}
+
+  footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;color:var(--muted);font-size:13px;}
+
+  .toast{
+    position:fixed;bottom:28px;right:28px;
+    background:var(--surface);border:1px solid rgba(16,185,129,.3);color:var(--success);
+    padding:12px 22px;border-radius:10px;font-size:14px;font-weight:600;
+    display:none;z-index:200;box-shadow:0 6px 24px rgba(0,0,0,.4);
+    animation:tIn .25s ease;
+  }
+  @keyframes tIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  @media(max-width:650px){.grid{grid-template-columns:1fr 1fr;}}
+  @media(max-width:430px){.grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <a href="dashboard.html" class="back-btn">← Dashboard</a>
+    <div class="logo">RobustAuth</div>
+    <div class="admin-badge">⚙️ ADMIN</div>
+  </header>
+
+  <div class="hero">
+    <h1>⚙️ Admin Control Panel</h1>
+    <p>Click each button for a step-by-step guide. Copy the command and paste it into the terminal.</p>
+  </div>
+
+  <!-- ACTION CARDS -->
+  <div class="grid">
+
+    <div class="acard" onclick="openModal('addStudent')">
+      <button class="run-btn">Guide →</button>
+      <div class="icon">👤</div>
+      <h3>Add Student</h3>
+      <p>Capture webcam photos and register a new student</p>
+      <span class="cmd-tag">admin_panel.py → 1</span>
+    </div>
+
+    <div class="acard" onclick="openModal('retrain')">
+      <button class="run-btn">Guide →</button>
+      <div class="icon">🧠</div>
+      <h3>Retrain Model</h3>
+      <p>Retrain the model after adding or deleting students</p>
+      <span class="cmd-tag">admin_panel.py → 2</span>
+    </div>
+
+    <div class="acard" onclick="openModal('export')">
+      <button class="run-btn">Guide →</button>
+      <div class="icon">📊</div>
+      <h3>Export Excel</h3>
+      <p>Convert attendance CSV files into formatted Excel files</p>
+      <span class="cmd-tag">admin_panel.py → 3</span>
+    </div>
+
+    <div class="acard" onclick="openModal('listStudents')">
+      <button class="run-btn">Guide →</button>
+      <div class="icon">📋</div>
+      <h3>Students List</h3>
+      <p>View all registered students and their photo counts</p>
+      <span class="cmd-tag">admin_panel.py → 4</span>
+    </div>
+
+    <div class="acard" onclick="openModal('deleteStudent')">
+      <button class="run-btn">Guide →</button>
+      <div class="icon">🗑️</div>
+      <h3>Delete Student</h3>
+      <p>Remove a student from the system</p>
+      <span class="cmd-tag">admin_panel.py → 5</span>
+    </div>
+
+    <div class="acard" onclick="openModal('startAttendance')">
+      <button class="run-btn">Guide →</button>
+      <div class="icon">📷</div>
+      <h3>Start Attendance</h3>
+      <p>Launch the scheduled capture-match attendance system</p>
+      <span class="cmd-tag">attendance_system.py</span>
+    </div>
+
+  </div>
+
+  <!-- PASSWORD CHANGE -->
+  <div class="pw-panel">
+    <h3>🔐 Dashboard Password Configuration</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
+      To change the dashboard password, note it below and update <code style="color:var(--accent)">dashboard.html</code> in
+      the <code style="color:var(--accent)">checkAdmin()</code> function. Replace the current value <code style="color:#7ee787">'admin123'</code> with your new password.
+    </p>
+    <div class="pw-row">
+      <input type="text" id="newPwNote" placeholder="Write the new password here..." maxlength="30">
+      <button class="pw-save" onclick="copyPwNote()">📋 Copy</button>
+    </div>
+    <p class="pw-note">⚠️ This is only a note. Change the actual password manually in dashboard.html.</p>
+  </div>
+
+  <footer>Robust Face Authentication Framework · Python + OpenCV + LBPH + CNN Anti-Spoofing</footer>
+
+</div><!-- /container -->
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Add Student -->
+<div class="modal-overlay" id="modal-addStudent">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('addStudent')">✕</button>
+    <h3>👤 Add Student</h3>
+    <div class="subtitle">Copy the command below and paste it into the terminal</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <p>Open the project folder in the terminal. On Windows, open the folder, press Shift + Right Click, and choose "Open PowerShell window here" or open it directly in VS Code Terminal.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <p>Run this command:</p>
+          <div class="cmd-block">
+            <span>python admin_panel.py</span>
+            <button class="copy-btn" onclick="copyCmd(this,'python admin_panel.py')">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <p>Enter the password → Press option <strong style="color:var(--accent)">1</strong> → Type the student name → Capture three webcam angles by pressing SPACE</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <p>After capturing photos, <strong style="color:var(--warn)">model retraining is required.</strong> Run option 2 as well.</p>
+        </div>
+      </div>
+    </div>
+    <div class="note">💡 Keep the webcam window active, align the face inside the detection box, blink once, and press SPACE to force a capture attempt if automatic capture is delayed.</div>
+  </div>
+</div>
+
+<!-- Retrain -->
+<div class="modal-overlay" id="modal-retrain">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('retrain')">✕</button>
+    <h3>🧠 Retrain Model</h3>
+    <div class="subtitle">This step is required after adding or deleting students</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <p>Run this command in the terminal:</p>
+          <div class="cmd-block">
+            <span>python admin_panel.py</span>
+            <button class="copy-btn" onclick="copyCmd(this,'python admin_panel.py')">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <p>Press option <strong style="color:var(--accent)">2</strong> → The model will train automatically</p>
+          <p style="margin-top:6px">Training may take 30 to 90 seconds depending on the number of students</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <p>When the message "✅ Model saved!" appears, training is complete. Start the attendance system after that.</p>
+        </div>
+      </div>
+    </div>
+    <div class="note">⚠️ A new student will not be recognized until the model is retrained.</div>
+  </div>
+</div>
+
+<!-- Export Excel -->
+<div class="modal-overlay" id="modal-export">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('export')">✕</button>
+    <h3>📊 Export Excel</h3>
+    <div class="subtitle">CSV files from the attendance folder → formatted .xlsx files</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <p>Install openpyxl first if required:</p>
+          <div class="cmd-block">
+            <span>pip install openpyxl</span>
+            <button class="copy-btn" onclick="copyCmd(this,'pip install openpyxl')">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <p>Run the admin panel:</p>
+          <div class="cmd-block">
+            <span>python admin_panel.py</span>
+            <button class="copy-btn" onclick="copyCmd(this,'python admin_panel.py')">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <p>Choose option <strong style="color:var(--accent)">3</strong> → Select a file number or press <strong>A</strong> to export all files</p>
+          <p style="margin-top:6px">The Excel file will be saved inside the <code style="color:#7ee787">attendance/</code> folder.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- List Students -->
+<div class="modal-overlay" id="modal-listStudents">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('listStudents')">✕</button>
+    <h3>📋 Student List View</h3>
+    <div class="subtitle">All registered students with available image counts</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <p>Run this in the terminal:</p>
+          <div class="cmd-block">
+            <span>python admin_panel.py</span>
+            <button class="copy-btn" onclick="copyCmd(this,'python admin_panel.py')">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <p>Press option <strong style="color:var(--accent)">4</strong> → The student list will appear with photo counts</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Student -->
+<div class="modal-overlay" id="modal-deleteStudent">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('deleteStudent')">✕</button>
+    <h3>🗑️ Delete Student</h3>
+    <div class="subtitle">⚠️ This action is permanent and cannot be undone</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <p>Run this in the terminal:</p>
+          <div class="cmd-block">
+            <span>python admin_panel.py</span>
+            <button class="copy-btn" onclick="copyCmd(this,'python admin_panel.py')">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <p>Choose option <strong style="color:var(--accent)">5</strong> → Select the number → Type <strong>"yes"</strong> to confirm</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <p>After deletion, <strong style="color:var(--warn)">retrain the model</strong> using option 2</p>
+        </div>
+      </div>
+    </div>
+    <div class="note">⚠️ After deleting a student, all related photos will also be removed.</div>
+  </div>
+</div>
+
+<!-- Start Attendance -->
+<div class="modal-overlay" id="modal-startAttendance">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal('startAttendance')">✕</button>
+    <h3>📷 Start Attendance System</h3>
+    <div class="subtitle">Time-locked face recognition camera</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <p>Set the schedule from the teacher portal, or use the preconfigured demo schedule</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <p>Run this in the terminal:</p>
+          <div class="cmd-block">
+            <span>python attendance_system.py</span>
+            <button class="copy-btn" onclick="copyCmd(this,'python attendance_system.py')">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <p>The student stands in front of the camera, completes blink liveness verification, the captured face is matched with enrolled photos, and attendance is saved.</p>
+          <p style="margin-top:6px;color:var(--danger)">If a phone or screen is shown, the system can flag a spoof warning.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <p>Press <strong style="color:var(--accent)">Q</strong> in the camera window to close it</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function openModal(id) {
+    document.getElementById('modal-' + id).classList.add('open');
+  }
+  function closeModal(id) {
+    document.getElementById('modal-' + id).classList.remove('open');
+  }
+  // Close on outside click
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('open');
+      }
+    });
+  });
+
+  function copyCmd(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      showToast('📋 Command copied. Paste it into the terminal with Ctrl+V.');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function copyPwNote() {
+    const val = document.getElementById('newPwNote').value.trim();
+    if (!val) { showToast('❌ Please enter a password first.', true); return; }
+    navigator.clipboard.writeText(val).then(() => showToast('📋 Password copied. Update dashboard.html manually.'));
+  }
+
+  function showToast(msg, err=false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    t.style.color = err ? 'var(--danger)' : 'var(--success)';
+    t.style.borderColor = err ? 'rgba(239,68,68,.3)' : 'rgba(16,185,129,.3)';
+    setTimeout(() => { t.style.display = 'none'; }, 3000);
+  }
+</script>
+</body>
+</html>
