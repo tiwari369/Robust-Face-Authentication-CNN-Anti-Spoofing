@@ -493,22 +493,6 @@ Possible future improvements include:
 
 ---
 
-## Privacy and Ethical Note
-
-This project may involve biometric data such as face images. Such data should not be made public without proper consent.
-
-Before making this repository public, carefully check and remove:
-
-```text
-student face images
-attendance snapshots
-CSV attendance files
-trained biometric models
-reports containing personal details
-conference paper files if unpublished
-```
-
----
 
 ## Academic Note
 
